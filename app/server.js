@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const express = require("express");
@@ -31,7 +30,7 @@ app.get("/", async (req, res, next) => {
   }
 });
 
-// Lớp học phần: danh sách và tìm kiếm
+// Khóa học / lớp học phần: danh sách và tìm kiếm
 app.get("/courses", async (req, res, next) => {
   try {
     const q = String(req.query.q || "").trim();
@@ -89,8 +88,6 @@ app.get("/schedule", async (req, res, next) => {
   }
 });
 
-// Xử lý lỗi chung
-
 /* Kiểm tra thường xuyên: đọc dữ liệu từ MySQL */
 app.get("/assessments", async (req, res, next) => {
   try {
@@ -137,6 +134,139 @@ app.get("/system", async (req, res, next) => {
   }
 });
 
+// Bài học (lọc theo khóa học)
+app.get("/lessons", async (req, res, next) => {
+  try {
+    const courseId = Number(req.query.course_id) || 0;
+    const [courses] = await db.query(
+      "SELECT id, course_code, course_name FROM courses ORDER BY id"
+    );
+
+    let sql = `
+      SELECT l.id, l.lesson_no, l.title, l.content,
+             c.course_code, c.course_name
+      FROM lessons AS l
+      INNER JOIN courses AS c ON c.id = l.course_id
+    `;
+    const params = [];
+    if (courseId) {
+      sql += " WHERE l.course_id = ?";
+      params.push(courseId);
+    }
+    sql += " ORDER BY c.id, l.lesson_no";
+
+    const [lessons] = await db.query(sql, params);
+    res.render("lessons", { lessons, courses, courseId });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Học viên: danh sách + thêm mới
+app.get("/students", async (req, res, next) => {
+  try {
+    const [students] = await db.query(
+      "SELECT id, student_code, full_name, email, created_at FROM students ORDER BY id"
+    );
+    res.render("students", { students, error: req.query.error || "" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/students", async (req, res, next) => {
+  try {
+    const code = String(req.body.student_code || "").trim();
+    const name = String(req.body.full_name || "").trim();
+    const email = String(req.body.email || "").trim();
+
+    if (!code || !name || !/^\S+@\S+\.\S+$/.test(email)) {
+      return res.redirect(
+        "/students?error=" + encodeURIComponent("Dữ liệu không hợp lệ.")
+      );
+    }
+
+    await db.query(
+      "INSERT INTO students (student_code, full_name, email) VALUES (?, ?, ?)",
+      [code, name, email]
+    );
+    res.redirect("/students");
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.redirect(
+        "/students?error=" +
+          encodeURIComponent("Mã học viên hoặc email đã tồn tại.")
+      );
+    }
+    next(error);
+  }
+});
+
+// Đăng ký: danh sách + đăng ký học viên vào khóa học
+app.get("/enrollments", async (req, res, next) => {
+  try {
+    const [enrollments] = await db.query(`
+      SELECT e.id, e.enrolled_at,
+             s.student_code, s.full_name,
+             c.course_code, c.course_name
+      FROM enrollments AS e
+      INNER JOIN students AS s ON s.id = e.student_id
+      INNER JOIN courses  AS c ON c.id = e.course_id
+      ORDER BY e.enrolled_at DESC, e.id DESC
+    `);
+    const [students] = await db.query(
+      "SELECT id, student_code, full_name FROM students ORDER BY full_name"
+    );
+    const [courses] = await db.query(
+      "SELECT id, course_code, course_name FROM courses ORDER BY id"
+    );
+
+    res.render("enrollments", {
+      enrollments,
+      students,
+      courses,
+      error: req.query.error || ""
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/enrollments", async (req, res, next) => {
+  try {
+    const studentId = Number(req.body.student_id);
+    const courseId = Number(req.body.course_id);
+
+    if (!studentId || !courseId) {
+      return res.redirect(
+        "/enrollments?error=" +
+          encodeURIComponent("Vui lòng chọn học viên và khóa học.")
+      );
+    }
+
+    await db.query(
+      "INSERT INTO enrollments (student_id, course_id) VALUES (?, ?)",
+      [studentId, courseId]
+    );
+    res.redirect("/enrollments");
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.redirect(
+        "/enrollments?error=" +
+          encodeURIComponent("Học viên đã đăng ký khóa học này.")
+      );
+    }
+    if (error.code === "ER_NO_REFERENCED_ROW_2") {
+      return res.redirect(
+        "/enrollments?error=" +
+          encodeURIComponent("Học viên hoặc khóa học không tồn tại.")
+      );
+    }
+    next(error);
+  }
+});
+
+// Xử lý lỗi chung
 app.use((error, req, res, next) => {
   console.error("LMS error:", error.message);
 
@@ -144,9 +274,7 @@ app.use((error, req, res, next) => {
     return next(error);
   }
 
-  res.status(500).send(
-    "LMS gặp lỗi. Hãy kiểm tra log ứng dụng."
-  );
+  res.status(500).send("LMS gặp lỗi. Hãy kiểm tra log ứng dụng.");
 });
 
 const port = Number(process.env.PORT || 3000);

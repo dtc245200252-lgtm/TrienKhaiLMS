@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng ký | ICTU LMS Mini</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="main" style="margin-left:0">
+    <header class="topbar">
+      <a href="/">← Quay lại bảng tin LMS</a>
+      <strong>ĐĂNG KÝ KHÓA HỌC</strong>
+    </header>
+    <section class="content">
+      <h1>Đăng ký khóa học</h1>
+      <% if (error) { %><p><strong><%= error %></strong></p><% } %>
+
+      <form method="POST" action="/enrollments" style="margin-bottom:20px">
+        <select name="student_id" required aria-label="Học viên">
+          <option value="">-- Chọn học viên --</option>
+          <% students.forEach(s => { %>
+            <option value="<%= s.id %>"><%= s.student_code %> - <%= s.full_name %></option>
+          <% }) %>
+        </select>
+        <select name="course_id" required aria-label="Khóa học">
+          <option value="">-- Chọn khóa học --</option>
+          <% courses.forEach(c => { %>
+            <option value="<%= c.id %>"><%= c.course_code %> - <%= c.course_name %></option>
+          <% }) %>
+        </select>
+        <button type="submit">Đăng ký</button>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>STT</th><th>Học viên</th><th>Khóa học</th><th>Thời gian đăng ký</th></tr>
+          </thead>
+          <tbody>
+            <% if (enrollments.length === 0) { %>
+              <tr><td colspan="4">Chưa có đăng ký.</td></tr>
+            <% } %>
+            <% enrollments.forEach((e, i) => { %>
+              <tr>
+                <td><%= i + 1 %></td>
+                <td><%= e.student_code %> - <%= e.full_name %></td>
+                <td><%= e.course_code %> - <%= e.course_name %></td>
+                <td><%= new Date(e.enrolled_at).toLocaleString('vi-VN') %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
