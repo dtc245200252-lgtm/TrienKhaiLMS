@@ -1,4 +1,3 @@
-
 services:
   db:
     image: mysql:8.0.44
@@ -20,6 +19,21 @@ services:
       timeout: 5s
       retries: 12
       start_period: 30s
+
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "127.0.0.1:8082:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
 
   app:
     build:
