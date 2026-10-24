@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bảng tin LMS ICTU Mini</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">LMS <span>FOR STUDENTS</span></div>
+    <div class="profile">🎓 Sinh viên<br><small>ICTU LMS Mini</small></div>
+
+    <p class="section">HỌC TẬP</p>
+    <a class="active" href="/">▦ Bảng tin LMS</a>
+    <a href="/courses">▣ Lớp học phần</a>
+    <a href="/schedule">▦ Thời khóa biểu</a>
+    <a href="/assessments">⚑ Kiểm tra thường xuyên</a>
+
+    <p class="section">HỆ THỐNG</p>
+    <a href="/system">⚙ Thông tin hệ thống</a>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <span>☰</span>
+      <strong>BẢNG TIN ICTU</strong>
+    </header>
+
+    <section class="banner">
+      <div class="banner-mark">LMS</div>
+      <div>
+        <p class="eyebrow">CỔNG HỌC TẬP · BẢN THỰC HÀNH</p>
+        <h1>CHÀO MỪNG ĐẾN VỚI LMS MINI</h1>
+        <p>Hệ thống mô phỏng phục vụ môn Triển khai và Quản trị Hệ thống Phần mềm</p>
+      </div>
+    </section>
+
+    <section class="section-title">
+      Các lớp học phần học kỳ hiện tại
+    </section>
+
+    <section class="content" id="courses">
+      <div class="summary">
+        <div><span>Tổng học phần</span><strong><%= courses.length %></strong></div>
+        <div><span>Tổng tín chỉ</span><strong><%= courses.reduce((sum, c) => sum + Number(c.credits || 0), 0) %></strong></div>
+        <div><span>Tổng buổi nghỉ</span><strong><%= courses.reduce((sum, c) => sum + Number(c.absences || 0), 0) %></strong></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên lớp học phần</th>
+              <th>Tín chỉ</th>
+              <th>Tuần học</th>
+              <th>Số buổi nghỉ</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% courses.forEach((course, index) => { %>
+              <tr>
+                <td><%= index + 1 %></td>
+                <td>
+                  <strong><%= course.course_name %></strong>
+                  <small><%= course.course_code %> · <%= course.lecturer || 'Chưa cập nhật giảng viên' %></small>
+                </td>
+                <td><%= course.credits %></td>
+                <td><%= course.total_weeks %></td>
+                <td><%= course.absences %></td>
+                <td><span class="status"><%= course.status %></span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>ICTU LMS Mini · Dữ liệu minh họa cho bài thực hành</footer>
+  </main>
+</body>
+</html>

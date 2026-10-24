@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kiểm tra thường xuyên - ICTU LMS</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="content">
+    <p><a href="/">← Quay lại bảng tin LMS</a></p>
+    <h1>Kiểm tra thường xuyên</h1>
+    <p>Dữ liệu được truy vấn trực tiếp từ MySQL.</p>
+
+    <p>Tổng số bài kiểm tra: <strong><%= assessments.length %></strong></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Bài kiểm tra</th>
+            <th>Học phần</th>
+            <th>Hình thức</th>
+            <th>Hạn kiểm tra</th>
+            <th>Điểm tối đa</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (assessments.length === 0) { %>
+            <tr>
+              <td colspan="7">Chưa có bài kiểm tra nào.</td>
+            </tr>
+          <% } %>
+
+          <% assessments.forEach((item, index) => { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td>
+                <strong><%= item.title %></strong>
+                <% if (item.description) { %>
+                  <br><small><%= item.description %></small>
+                <% } %>
+              </td>
+              <td>
+                <%= item.course_code %> -
+                <%= item.course_name %>
+              </td>
+              <td><%= item.assessment_type %></td>
+              <td>
+                <%= item.due_date
+                  ? new Date(item.due_date).toLocaleString("vi-VN")
+                  : "Chưa đặt hạn" %>
+              </td>
+              <td><%= Number(item.max_score).toFixed(2) %></td>
+              <td><%= item.status %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

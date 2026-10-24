@@ -1,0 +1,7 @@
+.env
+**/.env
+**/node_modules/
+**/.git/
+nginx/certs/*.key
+nginx/certs/*.crt
+*.bak

@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thông tin hệ thống - ICTU LMS</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="content">
+    <p><a href="/">← Quay lại bảng tin LMS</a></p>
+    <h1>Thông tin hệ thống</h1>
+    <p>Thông tin runtime và trạng thái kết nối cơ sở dữ liệu.</p>
+
+    <div class="table-wrap">
+      <table>
+        <tbody>
+          <tr>
+            <th>Ứng dụng</th>
+            <td>ICTU LMS Mini</td>
+          </tr>
+          <tr>
+            <th>Trạng thái ứng dụng</th>
+            <td>Đang phản hồi yêu cầu</td>
+          </tr>
+          <tr>
+            <th>Kết nối MySQL</th>
+            <td>Đã truy vấn thành công</td>
+          </tr>
+          <tr>
+            <th>Database</th>
+            <td><%= database.database_name %></td>
+          </tr>
+          <tr>
+            <th>Phiên bản MySQL</th>
+            <td><%= database.mysql_version %></td>
+          </tr>
+          <tr>
+            <th>Thời gian database</th>
+            <td><%= database.database_time %></td>
+          </tr>
+          <tr>
+            <th>Node.js</th>
+            <td><%= nodeVersion %></td>
+          </tr>
+          <tr>
+            <th>Môi trường</th>
+            <td><%= environment %></td>
+          </tr>
+          <tr>
+            <th>Thời gian chạy tiến trình</th>
+            <td><%= uptime %> giây</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

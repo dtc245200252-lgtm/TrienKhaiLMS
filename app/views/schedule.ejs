@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thời khóa biểu | ICTU LMS Mini</title>
+  <link rel="stylesheet" href="/style.css">
+
+  <style>
+    .schedule-page {
+      min-height: 100vh;
+      padding: 28px;
+      background: #f3f6fb;
+      color: #183153;
+    }
+
+    .schedule-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .schedule-header h1 {
+      margin: 8px 0;
+      font-size: 30px;
+    }
+
+    .schedule-header p {
+      color: #64748b;
+    }
+
+    .schedule-back {
+      color: #1677e8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .schedule-card {
+      overflow-x: auto;
+      background: white;
+      border: 1px solid #dce5f1;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(25, 55, 100, .04);
+    }
+
+    .schedule-table {
+      width: 100%;
+      min-width: 850px;
+      border-collapse: collapse;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #e6edf5;
+    }
+
+    .schedule-table th {
+      background: #e5f1ff;
+      color: #24466d;
+      font-size: 14px;
+    }
+
+    .schedule-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .schedule-table tbody tr:hover {
+      background: #f7faff;
+    }
+
+    .course-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .muted {
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .time-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      background: #e8f2ff;
+      color: #1765bc;
+      border-radius: 7px;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .room-badge {
+      display: inline-block;
+      padding: 5px 9px;
+      background: #e6f7ef;
+      color: #16794b;
+      border-radius: 6px;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: #64748b;
+    }
+
+    .schedule-count {
+      margin: 18px 0;
+      color: #526782;
+    }
+
+    @media (max-width: 640px) {
+      .schedule-page {
+        padding: 16px;
+      }
+
+      .schedule-header h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="schedule-page">
+    <header class="schedule-header">
+      <div>
+        <a class="schedule-back" href="/">
+          ← Quay lại bảng tin LMS
+        </a>
+
+        <h1>Thời khóa biểu</h1>
+        <p>
+          Lịch học được truy vấn trực tiếp từ cơ sở dữ liệu MySQL.
+        </p>
+      </div>
+
+      <a class="schedule-back" href="/courses">
+        Xem lớp học phần →
+      </a>
+    </header>
+
+    <p class="schedule-count">
+      Tổng số buổi học:
+      <strong><%= schedules.length %></strong>
+    </p>
+
+    <section class="schedule-card">
+      <% if (schedules.length === 0) { %>
+        <div class="empty-state">
+          <h3>Chưa có lịch học</h3>
+          <p>Hãy thêm lịch học trong cơ sở dữ liệu MySQL.</p>
+        </div>
+      <% } else { %>
+        <table class="schedule-table">
+          <thead>
+            <tr>
+              <th>Thứ</th>
+              <th>Thời gian</th>
+              <th>Mã học phần</th>
+              <th>Tên học phần</th>
+              <th>Giảng viên</th>
+              <th>Phòng học</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% schedules.forEach((item) => { %>
+              <tr>
+                <td>
+                    <strong>
+                        <%= Number(item.day_of_week) === 7
+                        ? "Chủ Nhật"
+                        : "Thứ " + (Number(item.day_of_week) + 1) %>
+                    </strong>
+                </td>
+
+                <td>
+                  <span class="time-badge">
+                    <%= String(item.start_time).slice(0, 8) %>
+                    –
+                    <%= String(item.end_time).slice(0, 8) %>
+                  </span>
+                </td>
+
+                <td><%= item.course_code %></td>
+
+                <td>
+                  <div class="course-name">
+                    <%= item.course_name %>
+                  </div>
+                </td>
+
+                <td>
+                  <%= item.lecturer || "Chưa cập nhật" %>
+                </td>
+
+                <td>
+                  <span class="room-badge">
+                    <%= item.room || "Chưa xếp phòng" %>
+                  </span>
+                </td>
+
+                <td><%= item.note || "—" %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </section>
+
+    <p class="muted">
+      ICTU LMS Mini · Dữ liệu thực hành, không phải lịch chính thức.
+    </p>
+  </main>
+</body>
+</html>
